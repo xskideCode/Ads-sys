@@ -26,10 +26,35 @@ export const Campaigns = [
 ];
 
 export const Creatives = [
-  { id: "cr1", hook: "Every new lead gets a call in under five minutes.", campaign: "Speed-to-Lead Kenya", ctr: 2.9, cpl: 1080, bookings: 14, costPerBooking: 2310, status: "WINNER", image: "https://images.unsplash.com/photo-1552581234-2616094c4280?auto=format&fit=crop&w=400&q=80" },
-  { id: "cr2", hook: "You're paying for leads you're replying to tomorrow.", campaign: "AI Automation Audit", ctr: 3.2, cpl: 1200, bookings: 9, costPerBooking: 2800, status: "PROMISING", image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=400&q=80" },
-  { id: "cr3", hook: "Your ads aren't broken. Your follow-up is.", campaign: "Missed Leads Retargeting", ctr: 3.8, cpl: 820, bookings: 2, costPerBooking: 8610, status: "LOSER", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=400&q=80" },
+  { id: "cr1", hook: "Every new lead gets a call in under five minutes.", campaign: "Speed-to-Lead Kenya", ctr: 2.9, cpl: 1080, bookings: 14, costPerBooking: 2310, status: "WINNER", image: "https://images.unsplash.com/photo-1552581234-2616094c4280?auto=format&fit=crop&w=400&q=80", inWinnerBucket: true, scaledBudget: "KES 6,000/day" },
+  { id: "cr2", hook: "You're paying for leads you're replying to tomorrow.", campaign: "AI Automation Audit", ctr: 3.2, cpl: 1200, bookings: 9, costPerBooking: 2800, status: "PROMISING", image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=400&q=80", inWinnerBucket: false },
+  { id: "cr3", hook: "Your ads aren't broken. Your follow-up is.", campaign: "Missed Leads Retargeting", ctr: 3.8, cpl: 820, bookings: 2, costPerBooking: 8610, status: "LOSER", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=400&q=80", inWinnerBucket: false },
+  { id: "cr4", hook: "What happens in the first 8 seconds after a WhatsApp ad click?", campaign: "Speed-to-Lead Kenya", ctr: 3.4, cpl: 940, bookings: 11, costPerBooking: 2420, status: "WINNER", image: "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=400&q=80", inWinnerBucket: true, scaledBudget: "KES 4,800/day" },
+  { id: "cr5", hook: "Stop sending ad traffic to a dead inbox on Friday evening.", campaign: "AI Automation Audit", ctr: 2.7, cpl: 1350, bookings: 6, costPerBooking: 3100, status: "PROMISING", image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=400&q=80", inWinnerBucket: false },
+  { id: "cr6", hook: "Turn cold ad chats into confirmed calendar slots automatically.", campaign: "Missed Leads Retargeting", ctr: 2.5, cpl: 1410, bookings: 4, costPerBooking: 3450, status: "PROMISING", image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=400&q=80", inWinnerBucket: false },
+  { id: "cr7", hook: "Why manual DM replies waste 40% of your Meta ad spend.", campaign: "Speed-to-Lead Kenya", ctr: 1.8, cpl: 2100, bookings: 1, costPerBooking: 9200, status: "LOSER", image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80", inWinnerBucket: false },
 ];
+
+export const PipelineSnapshotData = [
+  { stage: "NEW LEAD", count: 386, delta: "+34 today", note: "Inbound ad click", icon: "inbound" },
+  { stage: "FOLLOW-UP", count: 294, delta: "8s avg reply", note: "AI conversational intake", icon: "message" },
+  { stage: "QUALIFIED", count: 141, delta: "Criteria verified", note: "High commercial intent", icon: "check" },
+  { stage: "BOOKED", count: 58, delta: "Calendar synced", note: "Target outcome achieved", icon: "calendar" },
+  { stage: "PURCHASED", count: 12, delta: "KES 1.8M GMV", note: "Closed client contracts", icon: "dollar" },
+];
+
+export const ConversionFeedbackData = {
+  outcomeRecorded: "Meeting Booked",
+  leadName: "TechCorp Kenya",
+  channel: "WhatsApp Inbound",
+  signalType: "Conversions API (CAPI)",
+  destination: "Meta Dataset",
+  datasetId: "DS-9041-CAPI",
+  status: "SENT",
+  latency: "180ms",
+  matchQuality: "9.4 / 10",
+  lastSent: "Just now",
+};
 
 export const ActivityLog = [
   { id: 1, time: "NOW", type: "system", title: "Creative performance analysis running", detail: "" },

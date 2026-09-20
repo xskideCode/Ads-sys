@@ -1,6 +1,6 @@
 {
-  "name": "",
-  "description": "",
+  "name": "Rainlight_OS",
+  "description": "Meta ads and conversational revenue system connecting ads, AI messaging, and CAPI outcome feedback loops.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

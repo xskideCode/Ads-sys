@@ -17,6 +17,12 @@ import {
 } from 'recharts';
 import { motion, AnimatePresence } from 'motion/react';
 import { TextScramble } from './components/TextScramble';
+import { ClosedLoopOutcomeCard } from './components/ClosedLoopOutcomeCard';
+import { OutcomeSelectorCard } from './components/OutcomeSelectorCard';
+import { PipelineSnapshot } from './components/PipelineSnapshot';
+import { ConversionFeedbackVisual } from './components/ConversionFeedbackVisual';
+import { CreativeIntelligenceEnhanced } from './components/CreativeIntelligenceEnhanced';
+import { ShowcaseController, SHOWCASE_STEPS } from './components/ShowcaseController';
 
 function formatKES(amount: number) {
   return `KES ${amount.toLocaleString('en-KE')}`;
@@ -33,13 +39,40 @@ const TABS = {
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState(TABS.OVERVIEW);
+  const [showcaseActive, setShowcaseActive] = useState(false);
+  const [showcaseStepIndex, setShowcaseStepIndex] = useState(0);
+
+  const handleSelectShowcaseStep = (stepIdx: number) => {
+    setShowcaseStepIndex(stepIdx);
+    const targetTab = SHOWCASE_STEPS[stepIdx].tab;
+    if (targetTab === "Campaigns") setActiveTab(TABS.CAMPAIGNS);
+    else if (targetTab === "Conversations") setActiveTab(TABS.CONVERSATIONS);
+    else if (targetTab === "Creatives") setActiveTab(TABS.CREATIVES);
+    else if (targetTab === "Overview") setActiveTab(TABS.OVERVIEW);
+  };
+
+  const handleToggleShowcase = () => {
+    if (!showcaseActive) {
+      setShowcaseActive(true);
+      handleSelectShowcaseStep(0);
+    } else {
+      setShowcaseActive(false);
+    }
+  };
+
+  const currentFocusId = showcaseActive ? SHOWCASE_STEPS[showcaseStepIndex].focusId : undefined;
 
   return (
     <div className="min-h-screen flex w-full bg-rain-bg text-rain-white overflow-hidden font-sans">
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} activeTab={activeTab} setActiveTab={setActiveTab} />
       
       <main className="flex-1 flex flex-col h-screen overflow-hidden relative">
-        <Topbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} activeTab={activeTab} />
+        <Topbar 
+          toggleSidebar={() => setSidebarOpen(!sidebarOpen)} 
+          activeTab={activeTab} 
+          showcaseActive={showcaseActive}
+          onToggleShowcase={handleToggleShowcase}
+        />
         
         <div className="flex-1 overflow-y-auto p-4 md:p-8 relative">
           <AnimatePresence mode="wait">
@@ -49,16 +82,24 @@ export default function App() {
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
               transition={{ duration: 0.3 }}
-              className="max-w-7xl mx-auto space-y-8 pb-20 h-full"
+              className="max-w-7xl mx-auto space-y-8 pb-24 h-full"
             >
-              {activeTab === TABS.OVERVIEW && <OverviewView />}
-              {activeTab === TABS.CAMPAIGNS && <CampaignsView />}
-              {activeTab === TABS.CREATIVES && <CreativesView />}
-              {activeTab === TABS.CONVERSATIONS && <ConversationsView />}
+              {activeTab === TABS.OVERVIEW && <OverviewView focusId={currentFocusId} />}
+              {activeTab === TABS.CAMPAIGNS && <CampaignsView isFocused={currentFocusId === 'campaigns-sync'} />}
+              {activeTab === TABS.CREATIVES && <CreativesView focusId={currentFocusId} />}
+              {activeTab === TABS.CONVERSATIONS && <ConversationsView isFocused={currentFocusId === 'inbox-response'} />}
               {activeTab === TABS.AGENT_CONFIG && <AgentConfigView />}
             </motion.div>
           </AnimatePresence>
         </div>
+
+        {/* Floating Showcase HUD Controller */}
+        <ShowcaseController
+          isActive={showcaseActive}
+          onToggle={handleToggleShowcase}
+          currentStepIndex={showcaseStepIndex}
+          onSelectStep={handleSelectShowcaseStep}
+        />
       </main>
     </div>
   );
@@ -68,19 +109,36 @@ export default function App() {
 // VIEWS
 // ==========================================
 
-function OverviewView() {
+function OverviewView({ focusId }: { focusId?: string }) {
   return (
     <>
       <DashboardHeader title="Rainlight_OS" />
       <KPISection />
       
+      {/* 1. Closed-loop outcome card */}
+      <div id="closed-loop">
+        <ClosedLoopOutcomeCard isFocused={focusId === 'closed-loop'} />
+      </div>
+
+      {/* 3. Pipeline snapshot */}
+      <div id="pipeline-snapshot">
+        <PipelineSnapshot isFocused={focusId === 'pipeline-snapshot'} />
+      </div>
+
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         <div className="xl:col-span-2 space-y-8">
+          {/* 2. Outcome selector card */}
+          <div id="outcome-selector">
+            <OutcomeSelectorCard isFocused={focusId === 'outcome-selector'} />
+          </div>
           <AcquisitionFunnel />
-          <AcquisitionLoop />
         </div>
         
         <div className="space-y-8">
+          {/* 4. Conversion feedback visual */}
+          <div id="capi-signal">
+            <ConversionFeedbackVisual isFocused={focusId === 'capi-signal'} />
+          </div>
           <AIDecisions />
           <ActivityFeed />
         </div>
@@ -89,38 +147,67 @@ function OverviewView() {
   );
 }
 
-function CampaignsView() {
+function CampaignsView({ isFocused }: { isFocused?: boolean }) {
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncStatus, setSyncStatus] = useState("LIVE METADATA SYNCED");
+
+  const handleSyncMeta = () => {
+    setIsSyncing(true);
+    setTimeout(() => {
+      setIsSyncing(false);
+      setSyncStatus("SYNC COMPLETE: 4 CAMPAIGNS ACTIVE");
+    }, 850);
+  };
+
   return (
-    <>
+    <div className={cn("transition-all duration-500", isFocused ? "ring-4 ring-rain-accent ring-offset-4 ring-offset-rain-bg p-2 clip-bl-sm" : "")}>
       <DashboardHeader title="Campaigns" />
-      <div className="flex justify-end gap-4 mb-4">
-        <Button variant="outline" className="text-rain-white"><RefreshCw size={14} className="mr-2"/> Sync Meta</Button>
-        <Button variant="black"><Plus size={14} className="mr-2"/> New Campaign</Button>
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6">
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="border-rain-white/30 text-rain-white font-mono text-[9px] py-1 px-2.5">
+            {syncStatus}
+          </Badge>
+          <span className="text-xs font-mono text-rain-muted hidden sm:inline">• Conversions API Target: Booked Meeting</span>
+        </div>
+        <div className="flex gap-3 self-end sm:self-auto">
+          <Button 
+            variant="outline" 
+            onClick={handleSyncMeta}
+            disabled={isSyncing}
+            className="text-rain-white border-white/20 hover:border-white gap-2 text-xs"
+          >
+            <RefreshCw size={14} className={isSyncing ? "animate-spin text-rain-accent" : ""} />
+            {isSyncing ? "SYNCING META..." : "SYNC META"}
+          </Button>
+          <Button variant="black">
+            <Plus size={14} className="mr-2"/> New Campaign
+          </Button>
+        </div>
       </div>
       <CampaignTable />
-    </>
+    </div>
   );
 }
 
-function CreativesView() {
+function CreativesView({ focusId }: { focusId?: string }) {
   return (
     <>
       <DashboardHeader title="Creatives" />
-      <div className="flex justify-end gap-4 mb-4">
-        <Button variant="black"><Bot size={14} className="mr-2"/> Generate Variations</Button>
-      </div>
-      <CreativeIntelligence />
+      <CreativeIntelligenceEnhanced 
+        isFocused={focusId === 'creative-variations'}
+        focusWinnerBucket={focusId === 'winner-bucket'}
+      />
     </>
   );
 }
 
-function ConversationsView() {
+function ConversationsView({ isFocused }: { isFocused?: boolean }) {
   const [filter, setFilter] = useState('ALL');
   
   const filtered = ConversationsList.filter(c => filter === 'ALL' || (filter === 'HANDOFF' && c.needsHandoff));
 
   return (
-    <div className="h-full flex flex-col">
+    <div className={cn("h-full flex flex-col transition-all duration-500", isFocused ? "ring-4 ring-rain-accent ring-offset-4 ring-offset-rain-bg p-2 clip-bl-sm" : "")}>
       <DashboardHeader title="Inbox" />
       
       <div className="flex-1 min-h-[500px] flex gap-6 mt-4">
@@ -351,7 +438,17 @@ function Sidebar({ isOpen, setIsOpen, activeTab, setActiveTab }: { isOpen: boole
   );
 }
 
-function Topbar({ toggleSidebar, activeTab }: { toggleSidebar: () => void; activeTab?: string }) {
+function Topbar({ 
+  toggleSidebar, 
+  activeTab,
+  showcaseActive,
+  onToggleShowcase,
+}: { 
+  toggleSidebar: () => void; 
+  activeTab?: string;
+  showcaseActive?: boolean;
+  onToggleShowcase?: () => void;
+}) {
   return (
     <header className="h-20 flex items-center justify-between px-4 md:px-8 shrink-0 z-30 relative">
       <div className="flex items-center gap-4">
@@ -365,13 +462,31 @@ function Topbar({ toggleSidebar, activeTab }: { toggleSidebar: () => void; activ
         </div>
       </div>
       
-      <div className="flex items-center gap-6">
-        <div className="relative hidden md:block">
+      <div className="flex items-center gap-3 md:gap-5">
+        {/* Showcase Mode quick-start toggle */}
+        {onToggleShowcase && (
+          <Button
+            variant={showcaseActive ? "accent" : "outline"}
+            size="sm"
+            onClick={onToggleShowcase}
+            className={cn(
+              "font-mono text-[10px] tracking-wider px-3 h-8 gap-2 clip-bl-sm",
+              showcaseActive 
+                ? "bg-rain-accent text-rain-white shadow-[0_0_15px_rgba(240,62,22,0.4)]" 
+                : "border-white/30 text-rain-white hover:border-white"
+            )}
+          >
+            <div className={cn("w-2 h-2 rounded-full", showcaseActive ? "bg-white animate-ping" : "bg-rain-accent")} />
+            <span className="font-bold">{showcaseActive ? "SHOWCASE ACTIVE" : "SHOWCASE MODE"}</span>
+          </Button>
+        )}
+
+        <div className="relative hidden lg:block">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-rain-muted" />
           <input 
             type="text" 
             placeholder="SEARCH CAMPAIGNS..." 
-            className="bg-rain-black border border-white/10 rounded-none px-9 py-2 text-xs font-mono tracking-wider focus:outline-none focus:border-rain-white transition-colors w-64 text-rain-white clip-bl-sm"
+            className="bg-rain-black border border-white/10 rounded-none px-9 py-2 text-xs font-mono tracking-wider focus:outline-none focus:border-rain-white transition-colors w-52 text-rain-white clip-bl-sm"
           />
         </div>
         <button className="relative text-rain-muted hover:text-rain-white transition-colors">
@@ -384,7 +499,7 @@ function Topbar({ toggleSidebar, activeTab }: { toggleSidebar: () => void; activ
             <button 
               key={net} 
               className={cn(
-                "px-4 py-1.5 text-[10px] font-bold font-mono tracking-widest uppercase transition-colors clip-bl-sm",
+                "px-3 md:px-4 py-1.5 text-[10px] font-bold font-mono tracking-widest uppercase transition-colors clip-bl-sm",
                 net === 'Meta' ? "bg-rain-white text-rain-black" : "text-rain-muted hover:text-rain-white"
               )}
             >
