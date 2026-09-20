@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  
+  --color-rain-bg: #121212;
+  --color-rain-white: #f8f9fa;
+  --color-rain-black: #202124;
+  --color-rain-grey: #e8eaed;
+  --color-rain-accent: #ea4335;
+  --color-rain-muted: #9aa0a6;
+}
+
+@layer base {
+  body {
+    @apply bg-rain-bg text-rain-white font-sans;
+    background-image: radial-gradient(circle, #303134 1px, transparent 1px);
+    background-size: 16px 16px;
+  }
+  
+  /* Custom Scrollbars */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-rain-black);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-rain-accent);
+  }
+}
+
+@layer utilities {
+  .clip-tr { clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%); }
+  .clip-bl { clip-path: polygon(0 0, 100% 0, 100% 100%, 16px 100%, 0 calc(100% - 16px)); }
+  .clip-both { clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px)); }
+  
+  .clip-tr-sm { clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%); }
+  .clip-bl-sm { clip-path: polygon(0 0, 100% 0, 100% 100%, 8px 100%, 0 calc(100% - 8px)); }
+  .clip-both-sm { clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px)); }
+}
